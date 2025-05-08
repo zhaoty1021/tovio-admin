@@ -5,6 +5,7 @@ import authMenu from "@/assets/json/authMenu.json";
 import authUser from "@/assets/json/authUser.json";
 import { generateRoutes, generateFlattenRoutes } from "@/utils/filterRoute.ts";
 import { getShowStaticAndDynamicMenuList, getAllBreadcrumbList } from "@/utils/index.ts";
+import { getUserInfo } from "@/api/system/user/index";
 
 // 权限数据，不进行持久化。否则刷新浏览器无法获取新的数据。
 const authStore = defineStore("auth", {
@@ -44,11 +45,11 @@ const authStore = defineStore("auth", {
       this.breadcrumbList = staticRouter.concat(generateRoutes(authMenu.data, 0));
     },
     // 获取角色数据 AND 按钮数据 AND 用户信息
-    async getLoginUserInfo() {
-      console.log("用户信息数据", authUser.data);
+    async getLoginUserInfo(userData: any) {
+      console.log("用户信息数据", userData);
       this.roleList = authUser.data.roles;
       this.buttonList = authUser.data.buttons;
-      this.loginUser = authUser.data.loginUser;
+      this.loginUser = userData;
     }
   },
   // 计算属性，和vuex是使用一样，getters里面不是方法，是计算返回的结果值
@@ -60,7 +61,9 @@ const authStore = defineStore("auth", {
     // 菜单权限列表 ==> 左侧菜单栏渲染，这里的菜单将后端数据进行递归，需要将动态路由 isHide == 0 的隐藏菜单剔除, 将静态路由 isHide == 0 的隐藏菜单剔除
     showMenuList: state => state.recursiveMenuList,
     // 递归处理后的所有面包屑导航列表
-    getBreadcrumbList: state => getAllBreadcrumbList(state.breadcrumbList)
+    getBreadcrumbList: state => getAllBreadcrumbList(state.breadcrumbList),
+    // 获取用户信息
+    getLoginUser: state => state.loginUser
   }
 });
 

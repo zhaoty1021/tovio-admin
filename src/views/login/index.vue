@@ -146,14 +146,15 @@ import { koiMsgError, koiNoticeSuccess, koiMsgSuccess } from "@/utils/koi.ts";
 import { useRouter } from "vue-router";
 import { koiMsgWarning } from "@/utils/koi.ts";
 // import { koiLogin } from "@/api/mock/index.ts";
-import authLogin from "@/assets/json/authLogin.json";
-import useUserStore from "@/stores/modules/user.ts";
+import useUserStore from "@/stores/modules/user";
+import useAuthStore from "@/stores/modules/auth";
 import useKeepAliveStore from "@/stores/modules/keepAlive.ts";
 import { HOME_URL } from "@/config/index.ts";
 import { initDynamicRouter } from "@/routers/modules/dynamicRouter.ts";
 import useTabsStore from "@/stores/modules/tabs.ts";
 
 const userStore = useUserStore();
+const authStore = useAuthStore();
 const tabsStore = useTabsStore();
 const keepAliveStore = useKeepAliveStore();
 const router = useRouter();
@@ -169,7 +170,7 @@ interface ILoginUser {
   captchaPicture: any;
 }
 
-import { authAdminLogin } from "@/api/system/user/index.ts";
+import { authAdminLogin } from "@/api/system/user/index";
 
 const loginForm = reactive<ILoginUser>({
   username: "",
@@ -214,8 +215,8 @@ const handleKoiLogin = () => {
         const res: any = await authAdminLogin({ username, password});
         console.log("tokenValue", res.data.tokenValue);
         userStore.setToken(res.data.tokenValue);
-        //userStore.setToken(authLogin.data.tokenValue);
-
+        console.log("res.data", res.data);
+        authStore.getLoginUserInfo(res.data);
         // 2、添加动态路由 AND 用户按钮 AND 角色信息 AND 用户个人信息
         await initDynamicRouter();
 

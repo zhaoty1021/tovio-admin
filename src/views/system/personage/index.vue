@@ -17,28 +17,28 @@
                 <el-icon size="15"> <UserFilled /> </el-icon>
                 <div class="p-l-2px">登录名称</div>
               </div>
-              <div v-text="mine.loginName"></div>
+              <div v-text="mineForm.nickName"></div>
             </div>
             <div class="flex justify-between p-y-12px">
               <div class="flex items-center">
                 <el-icon size="15"> <User /> </el-icon>
                 <div class="p-l-2px">用户名称</div>
               </div>
-              <div v-text="mine.userName"></div>
+              <div v-text="mineForm.userName"></div>
             </div>
             <div class="flex justify-between p-y-12px">
               <div class="flex items-center">
                 <el-icon size="15"> <Iphone /> </el-icon>
                 <div class="p-l-2px">手机号码</div>
               </div>
-              <div v-text="mine.phone"></div>
+              <div v-text="mineForm.phone"></div>
             </div>
             <div class="flex justify-between p-y-12px">
               <div class="flex items-center">
                 <el-icon size="15"> <Message /> </el-icon>
                 <div class="p-l-2px">用户邮箱</div>
               </div>
-              <div v-text="mine.email"></div>
+              <div v-text="mineForm.email"></div>
             </div>
             <div class="flex justify-between p-y-12px">
               <div class="flex items-center">
@@ -140,9 +140,10 @@
 </template>
 
 <script setup lang="ts" name="personagePage">
-import { nextTick, ref, reactive } from "vue";
-import { koiMsgError, koiMsgSuccess } from "@/utils/koi.ts";
-
+import { nextTick, ref, reactive, onMounted } from "vue";
+import { koiMsgError, koiMsgSuccess } from "@/utils/koi";
+// 导入接口
+import useAuthStore from "@/stores/modules/auth";
 // 个人信息
 const mine = ref({
   avatar: "https://pic4.zhimg.com/v2-702a23ebb518199355099df77a3cfe07_b.webp",
@@ -154,6 +155,11 @@ const mine = ref({
   roleName: "超级管理员",
   createTime: "2023-11-23 18:00:00"
 });
+
+// 获取用户信息
+const authStoreInstance = useAuthStore();
+const loginUser = authStoreInstance.getLoginUser;
+console.log("loginUser", loginUser);
 
 // el-card标签选中name
 const activeName = ref("first");
@@ -168,6 +174,20 @@ let mineForm = ref<any>({
   email: "",
   sex: "3"
 });
+
+// 在组件加载时初始化表单数据
+onMounted(() => {
+  if (loginUser) {
+    mineForm.value = {
+      loginName: loginUser.username || "",
+      nickName: loginUser.nickname || "",
+      phone: loginUser.phone || "",
+      email: loginUser.email || "",
+      sex: loginUser.sex || "3"
+    };
+  }
+});
+
 /** 清空表单数据 */
 const resetMineForm = () => {
   // 等待 DOM 更新完成
@@ -178,7 +198,8 @@ const resetMineForm = () => {
     }
   });     
   mineForm.value = {
-    loginName: "",
+    userName: "",
+    nickName: "",
     phone: "",
     email: "",
     sex: "3"
